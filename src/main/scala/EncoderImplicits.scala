@@ -1,13 +1,13 @@
 package com.vi_kas
 
 import CsvEncoder._
-import shapeless.{::, Generic, HList, HNil}
+import shapeless.{::, Generic, HList, HNil, Coproduct, :+:, CNil, Inl, Inr}
 
 package object EncoderImplicits {
 
   implicit val stringEncoder: CsvEncoder[String] = instance(str => List(str))
 
-  //instances of HLists
+  //instances of Products
   implicit val hnilEncoder: CsvEncoder[HNil] = instance(hnil => Nil)
 
   implicit def hlistEncoder[H, T <: HList](
@@ -16,6 +16,18 @@ package object EncoderImplicits {
                            tailEncoder: CsvEncoder[T]
                            ): CsvEncoder[H :: T] = instance {
                                 case h :: t => headEncoder.encode(h) ++ tailEncoder.encode(t)
+                      }
+
+  //instances of CoProducts
+  implicit val cNilEncoder: CsvEncoder[CNil] = instance(str => throw new Exception("Really?"))    // Cus it won't be needed
+
+  implicit def coProductCsvEncoder[H, T <: Coproduct](
+                                                     implicit
+                                                     headEncoder: CsvEncoder[H],
+                                                     tailEncoder: CsvEncoder[T]
+                                                     ): CsvEncoder[H :+: T] = instance{   // :+: is disjunction of types
+                           case Inl(h) => headEncoder.encode(h)
+                           case Inr(t) => tailEncoder.encode(t)
                       }
 
   //generic encoder
