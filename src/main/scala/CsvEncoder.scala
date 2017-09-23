@@ -1,3 +1,5 @@
+package com.vi_kas
+
 import shapeless.{::, HNil}
 import EncoderImplicits._
 
