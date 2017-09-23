@@ -1,7 +1,7 @@
 package com.vi_kas
 
 import CsvEncoder._
-import shapeless.{::, Generic, HList, HNil, Coproduct, :+:, CNil, Inl, Inr}
+import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
 
 package object EncoderImplicits {
 
@@ -12,10 +12,10 @@ package object EncoderImplicits {
 
   implicit def hlistEncoder[H, T <: HList](
                            implicit
-                           headEncoder: CsvEncoder[H],
+                           headEncoder: Lazy[CsvEncoder[H]],
                            tailEncoder: CsvEncoder[T]
                            ): CsvEncoder[H :: T] = instance {
-                                case h :: t => headEncoder.encode(h) ++ tailEncoder.encode(t)
+                                case h :: t => headEncoder.value.encode(h) ++ tailEncoder.encode(t)
                       }
 
   //instances of CoProducts
@@ -23,10 +23,10 @@ package object EncoderImplicits {
 
   implicit def coProductCsvEncoder[H, T <: Coproduct](
                                                      implicit
-                                                     headEncoder: CsvEncoder[H],
+                                                     headEncoder: Lazy[CsvEncoder[H]],
                                                      tailEncoder: CsvEncoder[T]
                                                      ): CsvEncoder[H :+: T] = instance{   // :+: is disjunction of types
-                           case Inl(h) => headEncoder.encode(h)
+                           case Inl(h) => headEncoder.value.encode(h)
                            case Inr(t) => tailEncoder.encode(t)
                       }
 
@@ -34,9 +34,9 @@ package object EncoderImplicits {
   implicit def genericEncoder[A, R](
                                 implicit
                                 gen: Generic.Aux[A, R],                  //converts concrete type => generic representation
-                                enc: CsvEncoder[R]                      //desired = CsvEncoder[gen.Repr]
+                                enc: Lazy[CsvEncoder[R]]                      //desired = CsvEncoder[gen.Repr]
                                 ): CsvEncoder[A] = {
-                            instance(a => enc.encode(gen.to(a)))      //Convert concrete<instance> to generic value reprn.
+                            instance(a => enc.value.encode(gen.to(a)))      //Convert concrete<instance> to generic value reprn.
                        }
   /* method-end notes
     ------------

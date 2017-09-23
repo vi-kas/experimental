@@ -1,5 +1,6 @@
 package com.vi_kas
 
+import com.vi_kas.Types._
 import EncoderImplicits._
 import shapeless.{::, HNil}
 
@@ -25,16 +26,8 @@ object BoringOldApp {
     )
 
     println(encodeCsv(listOfColors))
+
+    val concreteTreeLike = List(Branch(Branch(Leaf("LeftLeaf"), Leaf("RightLeaf")), Leaf("AbsoluteRightLeaf")))
+    println(encodeCsv(concreteTreeLike))
   }
-
-  sealed trait Colors
-
-  final case class Red(name: String)   extends Colors
-  final case class Green(name: String) extends Colors
-  final case class Blue(name: String)  extends Colors
-
-  type Body = String
-  type Cap  = String
-  type Color = String
-  type Bottle = Body :: Cap :: Color :: HNil      //makes no sense, right?
 }
