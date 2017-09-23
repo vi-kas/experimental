@@ -12,7 +12,7 @@ package object EncoderImplicits {
 
   implicit def hlistEncoder[H, T <: HList](
                            implicit
-                           headEncoder: Lazy[CsvEncoder[H]],
+                           headEncoder: Lazy[CsvEncoder[H]],      //Lazy ~> head of hlist
                            tailEncoder: CsvEncoder[T]
                            ): CsvEncoder[H :: T] = instance {
                                 case h :: t => headEncoder.value.encode(h) ++ tailEncoder.encode(t)
@@ -23,7 +23,7 @@ package object EncoderImplicits {
 
   implicit def coProductCsvEncoder[H, T <: Coproduct](
                                                      implicit
-                                                     headEncoder: Lazy[CsvEncoder[H]],
+                                                     headEncoder: Lazy[CsvEncoder[H]],  //Lazy ~> coProducts
                                                      tailEncoder: CsvEncoder[T]
                                                      ): CsvEncoder[H :+: T] = instance{   // :+: is disjunction of types
                            case Inl(h) => headEncoder.value.encode(h)
@@ -33,8 +33,8 @@ package object EncoderImplicits {
   //generic encoder
   implicit def genericEncoder[A, R](
                                 implicit
-                                gen: Generic.Aux[A, R],                  //converts concrete type => generic representation
-                                enc: Lazy[CsvEncoder[R]]                      //desired = CsvEncoder[gen.Repr]
+                                gen: Generic.Aux[A, R],                 //converts concrete type => generic representation
+                                enc: Lazy[CsvEncoder[R]]               //desired = CsvEncoder[gen.Repr]
                                 ): CsvEncoder[A] = {
                             instance(a => enc.value.encode(gen.to(a)))      //Convert concrete<instance> to generic value reprn.
                        }
@@ -45,7 +45,17 @@ package object EncoderImplicits {
       cause: we can’t refer to a type member of one parameter from another parameter in the same block.
       gen: Generic.Aux[A, R] is shorthand for gen: Generic[A]{type Repr = R}
 
-    ------------
+    --------------------
+    Implicit Divergence:
+    --------------------
+      cause: compiler sees same type cons twice, it assumes, branch of search is “diverging”.
+      This is a problem for shapeless because types like ::[H, T] and :+:[H, T] can appear several
+      times as the compiler expands different generic representa ons.
+      we used Lazy[
+          1. suppress implicit divergence at compile time.
+          2. defers evaluation of implicit params at runtime, permitting the derivation of self-referential implicits.
+      ] to resolve!
+    --------------------
    */
 
 }
