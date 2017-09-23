@@ -1,8 +1,8 @@
 package com.vi_kas
 
-import com.vi_kas.Types._
-import EncoderImplicits._
-import shapeless.{::, HNil}
+import com.vi_kas.types._
+import encoderImplicits._
+import shapeless.{HNil}
 
 object BoringOldApp {
   import CsvEncoder._
@@ -19,15 +19,15 @@ object BoringOldApp {
      * listOfColors has more than one type: List[Colors] and Product with Serializable with com.vi_kas.BoringOldApp.Colors
      * If you try removing : List[Colors] type reference, things may seem different to compiler.
      */
-    val listOfColors: List[Colors] = List(
-      Red("Red"),
-      Blue("Blue"),
-      Green("Green")
-    )
+    val listOfColors: List[Colors] = List(Red("Red"), Blue("Blue"), Green("Green"))
 
     println(encodeCsv(listOfColors))
 
     val concreteTreeLike = List(Branch(Branch(Leaf("LeftLeaf"), Leaf("RightLeaf")), Leaf("AbsoluteRightLeaf")))
     println(encodeCsv(concreteTreeLike))
+
+    println(getRepr(Blue("Blue").asInstanceOf[Colors]))  //Inl(Blue(Blue))
+    println(getRepr(Blue("blue")))                      //blue :: HNil
+    println(getRepr(Leaf("abc")))                      //abc :: HNil
   }
 }

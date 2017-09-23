@@ -2,7 +2,7 @@ package com.vi_kas
 
 import shapeless.{::, HNil}
 
-package object Types {
+package object types {
   type Body = String
   type Cap  = String
   type Color = String

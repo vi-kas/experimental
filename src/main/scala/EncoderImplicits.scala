@@ -3,7 +3,9 @@ package com.vi_kas
 import CsvEncoder._
 import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
 
-package object EncoderImplicits {
+package object encoderImplicits {
+
+  def getRepr[A](value: A)(implicit gen: Generic[A]) = gen.to(value)
 
   implicit val stringEncoder: CsvEncoder[String] = instance(str => List(str))
 
