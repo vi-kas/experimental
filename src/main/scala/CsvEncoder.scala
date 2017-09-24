@@ -10,5 +10,5 @@ object CsvEncoder {
   def instance[A](func: A => List[String]): CsvEncoder[A] = (value: A) => func(value) // constructor
 
   def encodeCsv[A](list: List[A])(implicit csvEncoder: CsvEncoder[A]) =             //utility
-    list.map(mem => csvEncoder.encode(mem).mkString(",")).mkString("\n")
+    list.map(mem => csvEncoder.encode(mem).mkString(", ")).mkString("\n")
 }
