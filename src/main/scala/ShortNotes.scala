@@ -55,5 +55,10 @@ object ShortNotes {
   /* method-end notes
    * 1. No witness present ~> got the value!
    */
- 
+
+  /* shapeless records: HList of Tagged elements
+   * are used by LabelledGeneric!
+   */
+
+
 }

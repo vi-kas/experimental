@@ -17,3 +17,15 @@ package object types {
   case class Branch[A](left: TreeLike[A], right: TreeLike[A]) extends TreeLike[A]
   case class Leaf[A](value: A) extends TreeLike[A]
 }
+
+package object cjsonTypes {  //cjson is nothing but custom json
+  sealed trait CJSValue
+  case class CJsonObject(fields: List[(String, CJSValue)]) extends
+    CJSValue
+  case class CJsonArray(items: List[CJSValue]) extends CJSValue
+  case class CJsonString(value: String) extends CJSValue
+  case class CJsonNumber(value: Double) extends CJSValue
+  case class CJsonBoolean(value: Boolean) extends CJSValue
+  case object CJsonNull extends CJSValue
+
+}

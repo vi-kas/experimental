@@ -1,9 +1,10 @@
 package com.vi_kas
 
-import CsvEncoder._
+
 import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
 
 package object encoderImplicits {
+  import CsvEncoder._
 
   def getRepr[A](value: A)(implicit gen: Generic[A]) = gen.to(value)
 
@@ -59,5 +60,22 @@ package object encoderImplicits {
       ] to resolve!
     --------------------
    */
-
 }
+
+package object cjsonEncoderImplicits {
+  import com.vi_kas.CJsonEncoder._
+  import com.vi_kas.cjsonTypes.{CJsonBoolean, CJsonNumber, CJsonString, CJsonArray, CJsonNull}
+
+  /* LabelledGeneric Encoders */
+  implicit val stringJSEncoder: CJsonEncoder[String] = instance(str => CJsonString(str))
+  implicit val intJSEncoder: CJsonEncoder[Int] = instance(num => CJsonNumber(num))
+  implicit val doubleJSEncoder: CJsonEncoder[Double] = instance(doub => CJsonNumber(doub))
+  implicit val boolJSEncoder: CJsonEncoder[Boolean] = instance(bool => CJsonBoolean(bool))
+
+  implicit def listEncoder[A](implicit enc: CJsonEncoder[A]): CJsonEncoder[List[A]] =
+    instance(list => CJsonArray(list.map(enc.encode)))
+
+  implicit def optionEncoder[A](implicit enc: CJsonEncoder[A]): CJsonEncoder[Option[A]] =
+    instance(option => option.map(enc.encode).getOrElse(CJsonNull))
+
+ }
