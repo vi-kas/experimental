@@ -48,6 +48,7 @@ object opers {
     *       2. return type of apply is: Aux[S, instance.SOut] cuz we wanted to preserve type info. no type-erasure.
     *          apply method does not erase type member information
     *       3. implicitly from scala.Predef has that undesired behaviour
+    *       4. Type members are also imp, so we should use Aux type to preserve them, where we feel so.
     */
     object Second {
       type Aux[S <: HList, SO] = Second[S] { type SOut = SO }
