@@ -1,8 +1,5 @@
-package com.vi_kas
-package ops
+package com.vi_kas.ops
 
-import shapeless.ops.hlist.Last
-import shapeless.ops.hlist.Last.Aux
 import shapeless.{::, HList, HNil}
 
 object opers {
