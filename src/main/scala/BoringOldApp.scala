@@ -1,15 +1,15 @@
 package com.vi_kas
 
-import com.vi_kas.ops.opers.{LastLike, Second}
+import encoders.{CsvEncoder, cjsonEncoders, csvEncoder, jsonObjectEncoders}
+import com.vi_kas.encoders.csvEncoder.Implicits._
+import ops.opers.{LastLike, Second}
 import com.vi_kas.types._
-import encoderImplicits._
 import com.vi_kas.notes.ShortNotes.typeTagging
 import shapeless.{::, HNil}
 
 
 object BoringOldApp {
   import CsvEncoder._
-  import CJsonEncoder._
 
   private def hlistExample() = {
     lazy val bottleCsvEncoder: CsvEncoder[Bottle] = implicitly // boom!
@@ -49,9 +49,16 @@ object BoringOldApp {
   }
 
   private def jsonEncode() = {
-    import cjsonEncoderImplicits._
-    val couuntry = Country("India", "New Delhi")
-    println(encodeJson(List(couuntry)))
+    import com.vi_kas.encoders.CJsonEncoder.encodeJson
+    import com.vi_kas.encoders.cjsonEncoders.Implicits._
+    import com.vi_kas.encoders.jsonObjectEncoders.Implicits._
+
+    val country = Country("India", "New Delhi")
+    println(encodeJson(List(country)))
+  }
+
+  private def penultimate() = {
+
   }
 
   def main(args: Array[String]): Unit = {   // app
@@ -63,5 +70,7 @@ object BoringOldApp {
 
     typeTaggingAndPhantomTypes()
     jsonEncode()
+
+    penultimate()     // lemma pattern!!
   }
 }
