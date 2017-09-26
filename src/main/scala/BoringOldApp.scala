@@ -9,6 +9,7 @@ import shapeless.{::, HNil}
 
 object BoringOldApp {
   import CsvEncoder._
+  import CJsonEncoder._
 
   private def hlistExample() = {
     lazy val bottleCsvEncoder: CsvEncoder[Bottle] = implicitly // boom!
@@ -47,6 +48,12 @@ object BoringOldApp {
     typeTagging()
   }
 
+  private def jsonEncode() = {
+    import cjsonEncoderImplicits._
+    val couuntry = Country("India", "New Delhi")
+    println(encodeJson(List(couuntry)))
+  }
+
   def main(args: Array[String]): Unit = {   // app
     hlistExample()
     hlistCovariantExample()
@@ -55,5 +62,6 @@ object BoringOldApp {
     dependentTypes()
 
     typeTaggingAndPhantomTypes()
+    jsonEncode()
   }
 }

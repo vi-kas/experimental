@@ -16,12 +16,13 @@ package object types {
   sealed trait TreeLike[A]
   case class Branch[A](left: TreeLike[A], right: TreeLike[A]) extends TreeLike[A]
   case class Leaf[A](value: A) extends TreeLike[A]
+
+  case class Country(name: String, capital: String)
 }
 
 package object cjsonTypes {  //cjson is nothing but custom json
   sealed trait CJSValue
-  case class CJsonObject(fields: List[(String, CJSValue)]) extends
-    CJSValue
+  case class CJsonObject(fields: List[(String, CJSValue)]) extends CJSValue
   case class CJsonArray(items: List[CJSValue]) extends CJSValue
   case class CJsonString(value: String) extends CJSValue
   case class CJsonNumber(value: Double) extends CJSValue

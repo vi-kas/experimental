@@ -1,7 +1,8 @@
 package com.vi_kas
 
 
-import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
+import shapeless.labelled.FieldType
+import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, LabelledGeneric, Lazy, Witness}
 
 package object encoderImplicits {
   import CsvEncoder._
@@ -64,7 +65,7 @@ package object encoderImplicits {
 
 package object cjsonEncoderImplicits {
   import com.vi_kas.CJsonEncoder._
-  import com.vi_kas.cjsonTypes.{CJsonBoolean, CJsonNumber, CJsonString, CJsonArray, CJsonNull}
+  import com.vi_kas.cjsonTypes.{CJsonBoolean, CJsonNumber, CJsonString, CJsonArray, CJsonNull, CJsonObject}
 
   /* LabelledGeneric Encoders */
   implicit val stringJSEncoder: CJsonEncoder[String] = instance(str => CJsonString(str))
@@ -77,5 +78,42 @@ package object cjsonEncoderImplicits {
 
   implicit def optionEncoder[A](implicit enc: CJsonEncoder[A]): CJsonEncoder[Option[A]] =
     instance(option => option.map(enc.encode).getOrElse(CJsonNull))
+
+  implicit val hnilJSEncoder: CJSonObjectEncoder[HNil] = CJSonObjectEncoder.instance(ins => CJsonObject(Nil))
+
+  implicit def hlistObjectJSEncoder[K <: Symbol, H, T <: HList](    //K is sub-typed with Symbol? cuz we want to access the name of tag[1], ~> Symbol.name
+                                                  implicit
+                                                  witness: Witness.Aux[K],            //Because we want to access KeyTag value in the next block
+                                                  headEncoder: Lazy[CJsonEncoder[H]],
+                                                  tailEncoder: CJSonObjectEncoder[T]
+                                                  ): CJSonObjectEncoder[FieldType[K, H] :: T] = {
+                                            val fieldName = witness.value.name
+                                            CJSonObjectEncoder.instance { hl =>
+                                              val head = headEncoder.value.encode(hl.head)
+                                              val tail = tailEncoder.encode(hl.tail)
+                                              CJsonObject((fieldName, head) :: tail.fields)
+                                            }
+                                      }
+  /* method-end notes
+     ------------
+     Take Aways:  1. LabelledGeneric uses, Symbol for tags, that's why type bounded.
+     ------------
+   */
+
+  implicit def genericObjectEncoder[A, R <: HList](
+                                                  implicit
+                                                  gen: LabelledGeneric.Aux[A, R],   // 1.
+                                                  hEncoder: Lazy[CJSonObjectEncoder[R]]
+                                                  ): CJsonEncoder[A] = instance(ins => hEncoder.value.encode(gen.to(ins)))
+  /* method-end notes
+     ------------
+     Take Aways:  1. gen: LabelledGeneric.Aux[A, R] is shorthand for gen: Generic[A]{type Repr = R}
+     ------------
+   */
+
+
+
+
+
 
  }
