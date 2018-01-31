@@ -1,3 +1,5 @@
 This is line one added in featureOne.
 
 This is line two added in proposalOne.
+
+This is line two added in proposalTwo.
